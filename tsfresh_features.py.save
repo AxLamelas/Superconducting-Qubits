@@ -1,0 +1,35 @@
+import pandas as pd
+import h5py
+import numpy as np
+from tsfresh import extract_features
+from tsfresh.feature_extraction.settings import 
+import h5py
+import os
+
+if __name__ == "__main__":
+
+    savefile = "tsfresh_features.h5"
+    datafile = "simSeriesData.h5"
+    chunckLength = 100
+
+
+    with h5py.File(datafile,"r") as f:
+        n = f["deltas"].shape[0]//chunckLength
+
+        for i in range(n):
+            print(f"Chunck: {i}")
+            ts = np.tile(f["t"],chunckLength)
+            deltas = np.reshape(f["deltas"][i*chunckLength:(i+1)*chunckLength],(-1,))
+            ids = np.repeat(range(i*chunckLength,(i+1)*chunckLength),f["deltas"].shape[1])
+
+            data = pd.DataFrame({'id':ids,'time':ts,'y':deltas})
+
+
+            features = extract_features(data,column_id="id", column_sort="time", default_fc_parameters=EfficientFCParameters(),n_jobs=15)
+
+            if savefile in os.listdir():
+                features.to_hdf(savefile, 'features', mode='a',complevel=9, complib='gzip')
+            else:
+                features.to_hdf(savefile, 'features', mode='w',complevel=9, complib='gzip')
+
+                

@@ -1,0 +1,8 @@
+*.h5
+.venv/
+circuits/__pycache__/
+circuits/.vscode/
+fotosMunich/
+/.vscode/
+/__pycache__
+circuits/python/__pycache__/
